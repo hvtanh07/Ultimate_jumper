@@ -67,7 +67,7 @@ public class ObjectPooling : MonoBehaviour
         }
         pooledObjects.Clear();
     }
-    
+
     /// <summary>
     /// To return object to pool simply set it to inactive
     /// </summary>
@@ -75,13 +75,13 @@ public class ObjectPooling : MonoBehaviour
     /// <param name="location">The transform location of where you want to spawn it</param>
     /// /// <param name="setActive">Whether you want to set the object to active when spawned or set it yourself</param>
     /// <returns></returns>
-    public GameObject SpawnObject(string objectTag, Transform location, bool setActive = true)
+    public GameObject SpawnObject(string objectTag, Vector3 location, Quaternion roatation, bool setActive = true)
     {
         GameObject obj = GetPooledObject(objectTag);
         if (obj != null)
         {
-            obj.transform.position = location.position;
-            obj.transform.rotation = location.rotation;
+            obj.transform.position = location;
+            obj.transform.rotation = roatation;
             obj.SetActive(setActive);
             return obj;
         }
