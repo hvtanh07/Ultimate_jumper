@@ -94,7 +94,7 @@ public class LevelGenerator : MonoBehaviour
 
             // 2. Calculate Next Platform Position
             // Its *center* is at: (Gem's X) + (min distance) + (half width of new platform)
-            float nextPlatformCenterX = gemX + minXDistance + nextPlatformHalfWidth;
+            float nextPlatformCenterX = gemX + (minXDistance * 1.2f) + nextPlatformHalfWidth;
             nextPlatformSpawnPos = new Vector2(nextPlatformCenterX, nextY);
 
             didSpawnGemLast = true; // Mark that we just spawned a gem
