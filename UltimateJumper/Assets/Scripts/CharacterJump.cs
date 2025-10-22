@@ -22,6 +22,8 @@ public class CharacterJump : MonoBehaviour
     [Header("Double Jump Settings")]
     [Tooltip("The number of additional jumps the player can make while in the air.")]
     [SerializeField] private int airJumpsValue = 1;
+    [Tooltip("Delay an amount of time if player get the gem will register the double jump.")]
+    [SerializeField] private float airJumpDelay = 0.5f;
 
 
     [Header("Ground Check")]
@@ -79,43 +81,89 @@ public class CharacterJump : MonoBehaviour
     /// </summary>
     private void HandleJumpInput()
     {
-        // When the jump button is pressed and the character is grounded:
-        if (Input.GetMouseButtonDown(0) && isGrounded)
+        // When the jump button is pressed:
+        if (Input.GetMouseButtonDown(0))
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
-            isJumping = true;
-            jumpTimeCounter = maxJumpTime;
-        }
-        // Handle air jump
-        else if (Input.GetMouseButtonDown(0) && !isGrounded && airJumpsLeft > 0)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
-            isJumping = true;
-            jumpTimeCounter = maxJumpTime;
-            airJumpsLeft--; // Consume an air jump
-        }
-
-
-        // While the jump button is held and the character is jumping:
-        if (Input.GetMouseButton(0) && isJumping)
-        {
-            if (jumpTimeCounter > 0)
+            // Grounded immediate jump
+            if (isGrounded)
             {
-                // The actual height increase is now handled by reducing gravity in HandleGravity().
-                // We just need to count down the time here.
-                jumpTimeCounter -= Time.deltaTime;
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
+                isJumping = true;
+                jumpTimeCounter = maxJumpTime;
             }
+            // Air jump available -> immediate air jump
+            else if (airJumpsLeft > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
+                isJumping = true;
+                jumpTimeCounter = maxJumpTime;
+                airJumpsLeft--; // Consume an air jump
+            }
+            // No air jumps left -> start a short "register window" for a possible future air jump
             else
             {
-                // Max jump time has been reached.
+                // Use jumpTimeCounter as the waiting timer when not jumping.
+                // While this timer > 0 and the button is held, if airJumpsLeft becomes > 0 we will trigger the air jump.
+                jumpTimeCounter = airJumpDelay;
                 isJumping = false;
             }
         }
 
-        // When the jump button is released, stop the "jump hold" phase.
+        // If we're waiting for an air jump (not currently jumping and waiting timer > 0)
+        if (!isJumping && jumpTimeCounter > 0f && !isGrounded)
+        {
+            // If the player obtained an air jump within the delay, register the air jump now.
+            if (airJumpsLeft > 0)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, initialJumpVelocity);
+                isJumping = true;
+                jumpTimeCounter = maxJumpTime;
+                airJumpsLeft--;
+            }
+            else
+            {
+                // Count down the waiting timer only while the jump button is still held.
+                if (Input.GetMouseButton(0))
+                {
+                    jumpTimeCounter -= Time.deltaTime;
+                    if (jumpTimeCounter <= 0f)
+                    {
+                        jumpTimeCounter = 0f; // cancel waiting when time runs out
+                    }
+                }
+
+                // Cancel waiting if the player releases the button before an air jump becomes available.
+                if (Input.GetMouseButtonUp(0))
+                {
+                    jumpTimeCounter = 0f;
+                }
+            }
+        }
+
+        // While the jump button is held and the character is in the "jumping / jump-hold" phase:
+        if (Input.GetMouseButton(0) && isJumping)
+        {
+            if (jumpTimeCounter > 0f)
+            {
+                // The height is handled by reducing gravity in HandleGravity(); just count down time here.
+                jumpTimeCounter -= Time.deltaTime;
+            }
+            else
+            {
+                // Max jump time reached.
+                isJumping = false;
+            }
+        }
+
+        // When the jump button is released, stop the "jump hold" phase and cancel any waiting window.
         if (Input.GetMouseButtonUp(0))
         {
             isJumping = false;
+            // Cancel waiting timer if any
+            if (!isJumping)
+            {
+                jumpTimeCounter = 0f;
+            }
         }
     }
 

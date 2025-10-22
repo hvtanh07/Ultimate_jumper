@@ -13,9 +13,13 @@ MonoBehaviour:
   m_Name: LevelData
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  destroyXPosition: -10
-  minXDistance: 2
-  maxXDistance: 5
-  minYDistance: -1
-  maxYDistance: 1
-  initialSpawnPos: {x: 10, y: 0}
+  initialSpawnPos: {x: 2.74, y: 0}
+  spawnTriggerX: 15
+  destroyXPosition: -15
+  minXDistance: 4
+  maxXDistance: 7
+  minYDistance: -4
+  maxYDistance: 3
+  minYHeight: -6
+  maxYHeight: 3
+  gemSpawnChance: 0.2

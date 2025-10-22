@@ -59,13 +59,12 @@ public class ObjectPooling : MonoBehaviour
         return null;
     }
 
-    public void clearPool()
+    public void returnAll()
     {
         foreach (GameObject obj in pooledObjects)
         {
-            Destroy(obj);
+            obj.SetActive(false);
         }
-        pooledObjects.Clear();
     }
 
     /// <summary>

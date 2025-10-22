@@ -7,8 +7,8 @@ public class Platform : MonoBehaviour
 {
     private float moveSpeed;
     private float destroyXPosition;
-    private string platformTag; // "ShortPlatform" or "MediumPlatform"
     private float platformWidth;
+    private bool startMoving;
 
     // We cache the width on Awake
     void Awake()
@@ -18,15 +18,22 @@ public class Platform : MonoBehaviour
     }
 
     // Call this from the generator to set properties
-    public void Setup(float speed, float destroyX, string tag)
+    public void Setup(float speed, float destroyX, bool gameStart)
     {
         moveSpeed = speed;
         destroyXPosition = destroyX;
-        platformTag = tag;
+        startMoving = gameStart; // If it's game start, don't move yet
+    }
+
+    public void StartGame()
+    {
+        startMoving = true;
     }
 
     void Update()
     {
+        // Game not started don't move just yet
+        if (!startMoving) return;
         // Move the platform to the left
         transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
 
