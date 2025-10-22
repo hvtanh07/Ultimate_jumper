@@ -23,3 +23,11 @@ MonoBehaviour:
   minYHeight: -6
   maxYHeight: 3
   gemSpawnChance: 0.2
+  initialJumpVelocity: 15
+  maxJumpTime: 0.35
+  baseGravityScale: 4
+  fallMultiplier: 1.5
+  jumpHoldGravityMultiplier: 0.5
+  airJumpsValue: 1
+  airJumpDelay: 0.3
+  groundCheckBoxSize: {x: 1, y: 0.2}

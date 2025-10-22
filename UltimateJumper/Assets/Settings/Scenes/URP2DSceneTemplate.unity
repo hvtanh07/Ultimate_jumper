@@ -157,8 +157,9 @@ MonoBehaviour:
   fallMultiplier: 1.5
   jumpHoldGravityMultiplier: 0.5
   airJumpsValue: 1
+  airJumpDelay: 0.3
   groundCheck: {fileID: 1939223210}
-  groundCheckBoxSize: {x: 1, y: 0.1}
+  groundCheckBoxSize: {x: 1, y: 0.2}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -697,11 +698,16 @@ MonoBehaviour:
   destroyXPosition: -15
   minXDistance: 4
   maxXDistance: 7
-  minYDistance: -3
+  minYDistance: -4
   maxYDistance: 3
-  minYHeight: -5
-  maxYHeight: 4
+  minYHeight: -6
+  maxYHeight: 3
   gemSpawnChance: 0.2
+  didSpawnGemLast: 0
+  lastSpawnedPlatform: {fileID: 0}
+  shortPlatformWidth: 0
+  mediumPlatformWidth: 0
+  gameStart: 0
 --- !u!4 &1669629935
 Transform:
   m_ObjectHideFlags: 0
@@ -731,10 +737,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pooledObjects: []
   itemsToPool:
-  - amountToPool: 10
+  - amountToPool: 5
     objectToPool: {fileID: 2015107030935861263, guid: 3631965010b33c542a8d9d0d5f5f5a67, type: 3}
     shouldExpand: 1
-  - amountToPool: 10
+  - amountToPool: 5
     objectToPool: {fileID: 1808970890522577796, guid: fd4f24443a3b44144bd23aef22521548, type: 3}
     shouldExpand: 1
   - amountToPool: 3
