@@ -11,7 +11,7 @@ public class SinglePathState : IState
     public void OnUpdate()
     {
         // Calculate the position of the right edge of the last spawned platform
-        float lastPlatformWidth = owner.lastSpawnedPlatform.GetComponent<Platform>().GetWidth();
+        float lastPlatformWidth = owner.lastSpawnedPlatform.GetWidth();
         float lastPlatformRightEdge = owner.lastSpawnedPlatform.transform.position.x + lastPlatformWidth / 2;
 
         // If the right edge has moved far enough to the left, spawn the next element
