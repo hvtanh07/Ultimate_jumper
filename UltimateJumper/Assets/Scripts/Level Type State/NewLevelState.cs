@@ -7,6 +7,12 @@ public class NewLevelState : IState
     List<Platform> newLevelPlatformList;
     int InitPlatformCount = 3;
     int currentIndex;
+    float minXDistance = 2f;
+    float maxXDistance = 5f;
+    float minYDistance = -1.5f;
+    float maxYDistance = 2.5f;
+
+
     public void OnEnter(LevelGenerator stateMachine)
     {
         owner = stateMachine;
@@ -19,6 +25,10 @@ public class NewLevelState : IState
         // Keep a default but allow it to be changed elsewhere if needed
         InitPlatformCount = 3;
         currentIndex = 0;
+        minXDistance = owner.minXDistance;
+        maxXDistance = owner.maxXDistance;
+        minYDistance = owner.minYDistance;
+        maxYDistance = owner.maxYDistance;
 
         SpawnInitialPlatform();
     }
@@ -45,13 +55,13 @@ public class NewLevelState : IState
         foreach (Platform platform in newLevelPlatformList)
             platform.StartGame();
 
-        owner.ChangeState(new SinglePathState());
+        owner.ChangeState(new DividedLevelState());
     }
 
     // Helper to centralize initial platform spawning logic
     private void SpawnInitialPlatform()
     {
-        owner.SpawnPlatformAt(owner.initialSpawnPos, "Medium Platform", false);
+        owner.lastSpawnedPlatform = owner.SpawnPlatformAt(owner.initialSpawnPos, "Medium Platform", false, true);
         if (owner.lastSpawnedPlatform != null)
             newLevelPlatformList.Add(owner.lastSpawnedPlatform);
     }
@@ -63,31 +73,62 @@ public class NewLevelState : IState
 
     public void CalculateAndSpawnNext()
     {
-        // Get details from the last *platform*
-        Platform lastPlatformScript = owner.lastSpawnedPlatform.GetComponent<Platform>();
-        float lastPlatformWidth = lastPlatformScript.GetWidth();
-        Vector2 lastPlatformPos = owner.lastSpawnedPlatform.transform.position;
-        float lastPlatformRightEdgeX = lastPlatformPos.x + lastPlatformWidth / 2;
-
         // --- Decide next platform type and get its width ---
         string nextPlatformTag = (Random.value > 0.5f) ? "Short Platform" : "Medium Platform";
-        float nextPlatformHalfWidth = (nextPlatformTag == "Short Platform") ? owner.shortPlatformWidth / 2 : owner.mediumPlatformWidth / 2;
 
-        // --- Decide on vertical position ---
-        float yChange = Random.Range(owner.minYDistance, owner.maxYDistance);
-        float nextY = Mathf.Clamp(lastPlatformPos.y + yChange, owner.minYHeight, owner.maxYHeight);
-
-        // 1. Calculate random horizontal gap
-        float xGap = Random.Range(owner.minXDistance, owner.maxXDistance);
-
-        // 2. Calculate Next Platform Position
-        // Its *center* is at: (Right edge of last platform) + (gap) + (half width of new platform)
-        float nextPlatformCenterX = lastPlatformRightEdgeX + xGap + nextPlatformHalfWidth;
-        Vector2 nextPlatformSpawnPos = new Vector2(nextPlatformCenterX, nextY);
-
-        owner.didSpawnGemLast = false; // Mark that we did not spawn a gem
+        Vector2 nextplatformPos = CalculateNextPlatformPosition(owner.lastSpawnedPlatform, false);
 
         // Finally, spawn the new platform
-        owner.SpawnPlatformAt(nextPlatformSpawnPos, nextPlatformTag, false);
+        owner.lastSpawnedPlatform = owner.SpawnPlatformAt(nextplatformPos, nextPlatformTag, false);
+    }
+
+    public Vector2 CalculateNextPlatformPosition(Platform lastPlatform, bool isGemSpawn)
+    {
+        // Get details from the last *platform*
+        Platform lastPlatformScript = lastPlatform.GetComponent<Platform>();
+        float lastPlatformWidth = lastPlatformScript.GetWidth();
+        Vector2 lastPlatformPos = lastPlatform.transform.position;
+        float lastPlatformRightEdgeX = lastPlatformPos.x + lastPlatformWidth / 2;
+
+        // --- Decide on vertical position ---
+        float yChange = Random.Range(minYDistance, maxYDistance);
+        float nextY = Mathf.Clamp(lastPlatformPos.y + yChange, owner.minYHeight, owner.maxYHeight);
+
+        Vector2 nextPlatformSpawnPos;
+
+        if (isGemSpawn)
+        {
+            // *** GEM SPAWN LOGIC (Based on your specific rule) ***
+
+            // 1. Calculate Gem Position
+            // X: (Right edge of last platform) + (max distance)
+            float gemX = lastPlatformRightEdgeX + maxXDistance;
+            // Y: Vertically halfway between the last platform and the next one
+            float gemY = (lastPlatformPos.y + nextY) / 2;
+
+            owner.SpawnGemAt(new Vector2(gemX, gemY));
+
+            // 2. Calculate Next Platform Position
+            // Its *center* is at: (Gem's X) + (min distance * 1.2) + (half width of new platform)
+            float nextPlatformCenterX = gemX + minXDistance;
+            nextPlatformSpawnPos = new Vector2(nextPlatformCenterX, nextY);
+
+            owner.didSpawnGemLast = true; // Mark that we just spawned a gem
+        }
+        else
+        {
+            // *** NO GEM SPAWN LOGIC ***
+
+            // 1. Calculate random horizontal gap
+            float xGap = Random.Range(minXDistance, maxXDistance);
+
+            // 2. Calculate Next Platform Position
+            // Its *center* is at: (Right edge of last platform) + (gap) + (half width of new platform)
+            float nextPlatformCenterX = lastPlatformRightEdgeX + xGap;
+            nextPlatformSpawnPos = new Vector2(nextPlatformCenterX, nextY);
+
+            owner.didSpawnGemLast = false; // Mark that we did not spawn a gem
+        }
+        return nextPlatformSpawnPos;
     }
 }

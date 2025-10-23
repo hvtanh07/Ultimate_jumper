@@ -696,8 +696,8 @@ MonoBehaviour:
   initialSpawnPos: {x: -2.74, y: 0}
   spawnTriggerX: 15
   destroyXPosition: -15
-  minXDistance: 4
-  maxXDistance: 7
+  minXDistance: 3
+  maxXDistance: 6
   minYDistance: -4
   maxYDistance: 3
   minYHeight: -6
@@ -705,8 +705,6 @@ MonoBehaviour:
   gemSpawnChance: 0.2
   didSpawnGemLast: 0
   lastSpawnedPlatform: {fileID: 0}
-  shortPlatformWidth: 0
-  mediumPlatformWidth: 0
   gameStart: 0
 --- !u!4 &1669629935
 Transform:

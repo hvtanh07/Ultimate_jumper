@@ -33,7 +33,6 @@ public class Gem : MonoBehaviour
         if (player == null) return;
 
         player.ResetAirJumps();
-        print("Gem collected!");
         
         //spawn effect here later
         gameObject.SetActive(false);
